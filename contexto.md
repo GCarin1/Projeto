@@ -139,12 +139,16 @@ projeto/
 - [x] Commit + push → deploy automático na Vercel
 - [ ] Validar URL preview funcionando (depende do usuário conferir na Vercel)
 
-### Etapa 2 — Banco de dados (Supabase)
-- [ ] Receber URL e KEYS do Supabase do usuário
-- [ ] Script SQL com criação das 5 tabelas (DER)
-- [ ] Seed com dados de teste (profissionais, serviços)
-- [ ] Cliente Python `api/_lib/db.py` para o Supabase
-- [ ] Testes de conexão
+### Etapa 2 — Banco de dados (Supabase) 🚧
+- [x] Script SQL com criação das 5 tabelas (`db/migrations/001_init_schema.sql`)
+- [x] Seed com dados de teste — profissionais e serviços (`db/seed/001_seed_profissionais_servicos.sql`)
+- [x] Cliente Python `api/_lib/db.py` (lê env vars, cacheia instância, erros claros)
+- [x] Testes do cliente DB com mocks (4/4 ✅)
+- [x] Endpoint `/api/db_health` para validar conexão real (3/3 testes ✅)
+- [x] Documentação no README
+- [ ] **Pendente do usuário:** criar projeto no Supabase + configurar `SUPABASE_URL` e `SUPABASE_KEY` na Vercel
+- [ ] **Pendente do usuário:** rodar as migrations + seed no SQL Editor do Supabase
+- [ ] Validar `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
 
 ### Etapa 3 — Backend (APIs serverless em Python)
 - [ ] CRUD `/api/clientes` (testes + implementação)
@@ -187,8 +191,15 @@ projeto/
 
 ## 7. Pendências do usuário
 
-- [ ] Fornecer `SUPABASE_URL` e `SUPABASE_KEY` quando chegarmos na Etapa 2
-- [ ] Validar a URL de preview da Vercel após o primeiro deploy
+- [ ] Validar a URL de preview da Vercel após o primeiro deploy (Etapa 1)
+- [ ] **Criar projeto no Supabase** (https://supabase.com → New project)
+- [ ] **Rodar SQLs** no SQL Editor do Supabase, na ordem:
+  1. `db/migrations/001_init_schema.sql`
+  2. `db/seed/001_seed_profissionais_servicos.sql`
+- [ ] **Configurar Environment Variables na Vercel** (Project Settings → Environment Variables):
+  - `SUPABASE_URL` (da Project Settings → API → Project URL)
+  - `SUPABASE_KEY` (da Project Settings → API → anon public)
+- [ ] Validar `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
 
 ---
 
@@ -200,3 +211,5 @@ projeto/
 | 2026-04-25 | TypeScript em vez de JavaScript | Padrão moderno do Next.js, ajuda a pegar bugs cedo |
 | 2026-04-25 | Tailwind CSS | Produtividade e padrão da comunidade Next.js |
 | 2026-04-25 | Sem autenticação na v1 | Manter o escopo simples e funcional |
+| 2026-04-25 | Iniciar com `anon` key + RLS desabilitada | Não há autenticação ainda; trocar para `service_role` quando ativarmos RLS |
+| 2026-04-25 | UUIDs como PK (via `gen_random_uuid()`) | Padrão do Supabase, evita colisões e permite gerar IDs no client se preciso |
