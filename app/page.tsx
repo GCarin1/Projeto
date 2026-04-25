@@ -11,19 +11,21 @@ export default function Home() {
       <section className="mt-10 grid gap-4 sm:grid-cols-2">
         <a
           href="/agendamentos"
-          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow"
+          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <h2 className="text-xl font-semibold">Agenda</h2>
+          <div className="text-3xl mb-2">📅</div>
+          <h2 className="text-xl font-semibold text-slate-900">Agenda</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Visualizar e gerenciar os agendamentos.
+            Ver agendamentos e gerenciar status.
           </p>
         </a>
 
         <a
           href="/agendamentos/novo"
-          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow"
+          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <h2 className="text-xl font-semibold">Novo agendamento</h2>
+          <div className="text-3xl mb-2">➕</div>
+          <h2 className="text-xl font-semibold text-slate-900">Novo Agendamento</h2>
           <p className="mt-1 text-sm text-slate-600">
             Marcar um serviço para um cliente.
           </p>
@@ -31,9 +33,10 @@ export default function Home() {
 
         <a
           href="/clientes"
-          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow"
+          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <h2 className="text-xl font-semibold">Clientes</h2>
+          <div className="text-3xl mb-2">👥</div>
+          <h2 className="text-xl font-semibold text-slate-900">Clientes</h2>
           <p className="mt-1 text-sm text-slate-600">
             Cadastro de clientes e veículos.
           </p>
@@ -41,9 +44,10 @@ export default function Home() {
 
         <a
           href="/servicos"
-          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow"
+          className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <h2 className="text-xl font-semibold">Serviços</h2>
+          <div className="text-3xl mb-2">🔧</div>
+          <h2 className="text-xl font-semibold text-slate-900">Serviços</h2>
           <p className="mt-1 text-sm text-slate-600">
             Catálogo de serviços e profissionais.
           </p>
@@ -51,7 +55,7 @@ export default function Home() {
       </section>
 
       <footer className="mt-16 text-sm text-slate-500">
-        Etapa 1 — Fundação. Próximas funcionalidades chegam em breve.
+        Frontend em mock — aguardando integração com backend Python/Supabase.
       </footer>
     </main>
   );
