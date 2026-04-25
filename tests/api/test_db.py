@@ -1,44 +1,44 @@
 """Testes da camada de acesso ao banco (api/_lib/db.py).
 
-Os testes usam mocks porque não dependem de uma conexão real com o Supabase —
-queremos garantir o contrato do nosso wrapper (leitura de env vars, criação
-preguiçosa do cliente, mensagens de erro claras).
+Não dependem de uma conexão real — validam apenas o contrato do wrapper:
+leitura de env vars, criação preguiçosa do cliente HTTP e mensagens de erro.
 """
 
-from unittest.mock import patch
-
+import httpx
 import pytest
 
 from api._lib import db
 
 
-class FakeSupabaseClient:
-    """Stub do cliente Supabase usado nos testes."""
-
-    def __init__(self, url: str, key: str) -> None:
-        self.url = url
-        self.key = key
-
-
 @pytest.fixture(autouse=True)
 def _reset_client_cache() -> None:
-    """Garante que cada teste comece sem cliente cacheado."""
-    db._client = None  # noqa: SLF001 - acesso interno proposital nos testes
+    db.reset_client()
     yield
-    db._client = None  # noqa: SLF001
+    db.reset_client()
 
 
-def test_get_client_lê_env_vars_e_cria_cliente(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_get_client_lê_env_vars_e_cria_httpx_client(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("SUPABASE_URL", "https://exemplo.supabase.co")
     monkeypatch.setenv("SUPABASE_KEY", "chave-anon")
 
-    with patch.object(db, "create_client", side_effect=FakeSupabaseClient) as fake:
-        client = db.get_client()
+    client = db.get_client()
 
-    assert isinstance(client, FakeSupabaseClient)
-    assert client.url == "https://exemplo.supabase.co"
-    assert client.key == "chave-anon"
-    fake.assert_called_once_with("https://exemplo.supabase.co", "chave-anon")
+    assert isinstance(client, httpx.Client)
+    assert str(client.base_url) == "https://exemplo.supabase.co/rest/v1/"
+    assert client.headers["apikey"] == "chave-anon"
+    assert client.headers["Authorization"] == "Bearer chave-anon"
+
+
+def test_get_client_aceita_url_com_barra_no_final(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SUPABASE_URL", "https://exemplo.supabase.co/")
+    monkeypatch.setenv("SUPABASE_KEY", "chave-anon")
+
+    client = db.get_client()
+    assert str(client.base_url) == "https://exemplo.supabase.co/rest/v1/"
 
 
 def test_get_client_reusa_instancia_em_chamadas_subsequentes(
@@ -47,12 +47,10 @@ def test_get_client_reusa_instancia_em_chamadas_subsequentes(
     monkeypatch.setenv("SUPABASE_URL", "https://exemplo.supabase.co")
     monkeypatch.setenv("SUPABASE_KEY", "chave-anon")
 
-    with patch.object(db, "create_client", side_effect=FakeSupabaseClient) as fake:
-        primeiro = db.get_client()
-        segundo = db.get_client()
+    primeiro = db.get_client()
+    segundo = db.get_client()
 
     assert primeiro is segundo
-    assert fake.call_count == 1
 
 
 def test_get_client_falha_quando_supabase_url_ausente(

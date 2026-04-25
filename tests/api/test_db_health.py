@@ -6,6 +6,7 @@ from http.server import HTTPServer
 from threading import Thread
 from unittest.mock import MagicMock, patch
 
+import httpx
 import pytest
 
 from api import db_health
@@ -35,25 +36,31 @@ def _request_db_health() -> tuple[int, dict]:
 
 @pytest.fixture(autouse=True)
 def _reset_client_cache() -> None:
-    db._client = None  # noqa: SLF001
+    db.reset_client()
     yield
-    db._client = None  # noqa: SLF001
+    db.reset_client()
 
 
 def test_db_health_retorna_ok_quando_consulta_funciona() -> None:
-    fake_client = MagicMock()
-    fake_client.table.return_value.select.return_value.limit.return_value.execute.return_value.data = []
+    fake_client = MagicMock(spec=httpx.Client)
+    fake_response = MagicMock()
+    fake_response.raise_for_status.return_value = None
+    fake_client.get.return_value = fake_response
 
     with patch.object(db_health, "get_client", return_value=fake_client):
         status, body = _request_db_health()
 
     assert status == 200
     assert body == {"ok": True, "db": "connected"}
-    fake_client.table.assert_called_with("profissionais")
+    fake_client.get.assert_called_once_with(
+        "/profissionais", params={"select": "id", "limit": "1"}
+    )
 
 
 def test_db_health_retorna_503_quando_config_ausente() -> None:
-    erro = db.MissingSupabaseConfigError("Variáveis de ambiente ausentes: SUPABASE_URL")
+    erro = db.MissingSupabaseConfigError(
+        "Variáveis de ambiente ausentes: SUPABASE_URL"
+    )
     with patch.object(db_health, "get_client", side_effect=erro):
         status, body = _request_db_health()
 
@@ -63,10 +70,8 @@ def test_db_health_retorna_503_quando_config_ausente() -> None:
 
 
 def test_db_health_retorna_500_quando_consulta_falha() -> None:
-    fake_client = MagicMock()
-    fake_client.table.return_value.select.return_value.limit.return_value.execute.side_effect = (
-        RuntimeError("falha de conexão")
-    )
+    fake_client = MagicMock(spec=httpx.Client)
+    fake_client.get.side_effect = httpx.ConnectError("falha de conexão")
 
     with patch.object(db_health, "get_client", return_value=fake_client):
         status, body = _request_db_health()

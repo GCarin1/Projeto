@@ -1,7 +1,7 @@
 """Endpoint que valida a conexão com o Supabase.
 
 Acessível em ``GET /api/db_health``. Faz um SELECT mínimo na tabela
-``profissionais`` e responde com o status real da conexão.
+``profissionais`` via PostgREST e responde com o status real da conexão.
 """
 
 import json
@@ -23,7 +23,8 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801 - nome exigido pela Vercel
     def do_GET(self) -> None:  # noqa: N802
         try:
             client = get_client()
-            client.table("profissionais").select("id").limit(1).execute()
+            resp = client.get("/profissionais", params={"select": "id", "limit": "1"})
+            resp.raise_for_status()
         except MissingSupabaseConfigError as exc:
             _write_json(self, 503, {"ok": False, "error": str(exc)})
             return

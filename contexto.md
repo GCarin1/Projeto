@@ -26,7 +26,7 @@ Sistema de **agendamento web para uma oficina mecânica**, parte do projeto V8 o
 |---|---|---|
 | Frontend | **Next.js + TypeScript + Tailwind CSS** | Padrão moderno, integra nativamente com Vercel |
 | Backend | **Python serverless** (em `/api/*.py`) | Mantém o Python do plano original da TAP, roda como funções serverless na Vercel |
-| Banco | **Supabase (PostgreSQL)** | Plano gratuito, fácil setup, sem servidor para gerenciar |
+| Banco | **Supabase (PostgreSQL)** via REST | Plano gratuito, sem servidor para gerenciar. Usamos `httpx` para falar direto com o PostgREST (mais leve que o SDK) |
 | Hospedagem | **Vercel** | Já linkada ao repo `gcarin1/projeto` |
 | Testes (back) | **pytest** | Padrão Python |
 | Testes (front) | **Vitest** + React Testing Library | Mais rápido que Jest, padrão moderno |
@@ -213,3 +213,4 @@ projeto/
 | 2026-04-25 | Sem autenticação na v1 | Manter o escopo simples e funcional |
 | 2026-04-25 | Iniciar com `anon` key + RLS desabilitada | Não há autenticação ainda; trocar para `service_role` quando ativarmos RLS |
 | 2026-04-25 | UUIDs como PK (via `gen_random_uuid()`) | Padrão do Supabase, evita colisões e permite gerar IDs no client se preciso |
+| 2026-04-25 | Trocar SDK `supabase` por chamadas `httpx` ao PostgREST | SDK quebrou o build na Vercel (`uv pip install` exited with 1). httpx é leve, sem deps nativas, e cobre 100% do que precisamos (CRUD via REST) |
