@@ -4,8 +4,10 @@ Sistema de agendamento web para uma oficina mecânica. Clientes escolhem
 serviço, profissional e horário disponível; a recepção gerencia a agenda
 (confirmar / concluir / cancelar).
 
-> 📚 **Estudando o projeto?** Há uma documentação didática em [`docs/`](./docs/README.md)
-> explicando cada peça em linguagem acessível para quem está começando.
+> 📚 **Estudando o projeto?** Acesse a documentação didática:
+>
+> - 🌐 **[Site online](https://gcarin1.github.io/projeto/)** *(GitHub Pages — visual completo)*
+> - 📁 **[Pasta `docs/`](./docs/)** *(Markdown direto no GitHub)*
 
 ## Stack
 
@@ -113,4 +115,4 @@ projeto/
 ## Documentação adicional
 
 - [`contexto.md`](./contexto.md) — memória de longo prazo: decisões, etapas, histórico
-- [`docs/`](./docs/README.md) — guia de estudo, explicações didáticas
+- [`docs/`](./docs/) — guia de estudo, explicações didáticas (também publicado em [GitHub Pages](https://gcarin1.github.io/projeto/))
