@@ -8,7 +8,12 @@ from __future__ import annotations
 
 from http.server import BaseHTTPRequestHandler
 
-from api._lib.crud import handle_create, handle_list, method_not_allowed
+from api._lib.crud import (
+    handle_create,
+    handle_delete,
+    handle_list,
+    method_not_allowed,
+)
 from api._lib.http_utils import parse_query
 from api._lib.validators import validate_veiculo
 
@@ -26,13 +31,13 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801
         handle_create(self, "veiculos", validate_veiculo)
 
     def do_DELETE(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        handle_delete(self, "veiculos")
 
     def do_PUT(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        method_not_allowed(self, ["GET", "POST", "DELETE"])
 
     def do_PATCH(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        method_not_allowed(self, ["GET", "POST", "DELETE"])
 
     def log_message(self, format: str, *args: object) -> None:  # noqa: A002
         return

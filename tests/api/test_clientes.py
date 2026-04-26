@@ -109,5 +109,34 @@ def test_post_corpo_vazio_devolve_422() -> None:
 def test_metodo_nao_suportado_devolve_405() -> None:
     fake = _fake_client()
     with patch.object(crud, "get_client", return_value=fake):
-        status, _ = request_handler(endpoint.handler, "DELETE", "/api/clientes")
+        status, _ = request_handler(endpoint.handler, "PUT", "/api/clientes")
     assert status == 405
+
+
+def test_delete_remove_cliente_por_id() -> None:
+    fake = MagicMock(spec=httpx.Client)
+    response = MagicMock()
+    response.status_code = 204
+    response.raise_for_status.return_value = None
+    response.json.return_value = []
+    fake.delete.return_value = response
+
+    with patch.object(crud, "get_client", return_value=fake):
+        status, body = request_handler(
+            endpoint.handler, "DELETE", "/api/clientes?id=abc-123"
+        )
+
+    assert status == 200
+    assert body == {"ok": True}
+    fake.delete.assert_called_once_with(
+        "/clientes", params={"id": "eq.abc-123"}
+    )
+
+
+def test_delete_sem_id_devolve_422() -> None:
+    fake = _fake_client()
+    with patch.object(crud, "get_client", return_value=fake):
+        status, body = request_handler(endpoint.handler, "DELETE", "/api/clientes")
+    assert status == 422
+    assert "id" in " ".join(body["errors"])
+    fake.delete.assert_not_called()

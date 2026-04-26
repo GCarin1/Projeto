@@ -90,3 +90,31 @@ def method_not_allowed(handler: BaseHTTPRequestHandler, allowed: list[str]) -> N
         405,
         {"ok": False, "error": "método não permitido", "allowed": allowed},
     )
+
+
+def handle_delete(handler: BaseHTTPRequestHandler, table: str) -> None:
+    """DELETE genérico: remove registros filtrando por ?id=...
+
+    422 se faltar ``id`` na query string. Devolve 204 (sem corpo) em caso
+    de sucesso para casar com a semântica REST.
+    """
+    from .http_utils import parse_query  # import local pra evitar ciclo
+
+    query = parse_query(handler)
+    if not query.get("id"):
+        write_json(
+            handler,
+            422,
+            {"ok": False, "errors": ["query param 'id' é obrigatório"]},
+        )
+        return
+
+    try:
+        client = get_client()
+        resp = client.delete(f"/{table}", params={"id": f"eq.{query['id']}"})
+        resp.raise_for_status()
+    except Exception as exc:  # noqa: BLE001
+        _write_db_error(handler, exc)
+        return
+
+    write_json(handler, 200, {"ok": True})

@@ -12,7 +12,12 @@ from __future__ import annotations
 
 from http.server import BaseHTTPRequestHandler
 
-from api._lib.crud import handle_create, handle_list, method_not_allowed
+from api._lib.crud import (
+    handle_create,
+    handle_delete,
+    handle_list,
+    method_not_allowed,
+)
 from api._lib.db import get_client  # re-export para mocking nos testes
 from api._lib.validators import validate_cliente
 
@@ -27,13 +32,13 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801 - exigido pela Vercel
         handle_create(self, "clientes", validate_cliente)
 
     def do_DELETE(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        handle_delete(self, "clientes")
 
     def do_PUT(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        method_not_allowed(self, ["GET", "POST", "DELETE"])
 
     def do_PATCH(self) -> None:  # noqa: N802
-        method_not_allowed(self, ["GET", "POST"])
+        method_not_allowed(self, ["GET", "POST", "DELETE"])
 
     def log_message(self, format: str, *args: object) -> None:  # noqa: A002
         return

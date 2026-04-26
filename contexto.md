@@ -139,16 +139,16 @@ projeto/
 - [x] Commit + push → deploy automático na Vercel
 - [ ] Validar URL preview funcionando (depende do usuário conferir na Vercel)
 
-### Etapa 2 — Banco de dados (Supabase) 🚧
+### Etapa 2 — Banco de dados (Supabase) ✅
 - [x] Script SQL com criação das 5 tabelas (`db/migrations/001_init_schema.sql`)
 - [x] Seed com dados de teste — profissionais e serviços (`db/seed/001_seed_profissionais_servicos.sql`)
 - [x] Cliente Python `api/_lib/db.py` (lê env vars, cacheia instância, erros claros)
 - [x] Testes do cliente DB com mocks (4/4 ✅)
 - [x] Endpoint `/api/db_health` para validar conexão real (3/3 testes ✅)
 - [x] Documentação no README
-- [ ] **Pendente do usuário:** criar projeto no Supabase + configurar `SUPABASE_URL` e `SUPABASE_KEY` na Vercel
-- [ ] **Pendente do usuário:** rodar as migrations + seed no SQL Editor do Supabase
-- [ ] Validar `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
+- [x] Projeto criado no Supabase + `SUPABASE_URL` e `SUPABASE_KEY` configurados na Vercel
+- [x] Migrations rodadas no SQL Editor do Supabase
+- [x] `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
 
 ### Etapa 3 — Backend (APIs serverless em Python) ✅
 - [x] Helpers HTTP (`api/_lib/http_utils.py`) — read_json_body, write_json, parse_query, ValidationError (TDD: 8/8 ✅)
@@ -213,15 +213,12 @@ projeto/
 
 ## 7. Pendências do usuário
 
-- [ ] Validar a URL de preview da Vercel após o primeiro deploy (Etapa 1)
-- [ ] **Criar projeto no Supabase** (https://supabase.com → New project)
-- [ ] **Rodar SQLs** no SQL Editor do Supabase, na ordem:
-  1. `db/migrations/001_init_schema.sql`
-  2. `db/seed/001_seed_profissionais_servicos.sql`
-- [ ] **Configurar Environment Variables na Vercel** (Project Settings → Environment Variables):
-  - `SUPABASE_URL` (da Project Settings → API → Project URL)
-  - `SUPABASE_KEY` (da Project Settings → API → anon public)
-- [ ] Validar `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
+- [x] ~~Validar a URL de preview da Vercel após o primeiro deploy~~
+- [x] ~~Criar projeto no Supabase + configurar env vars na Vercel~~
+- [x] ~~Rodar SQLs no SQL Editor do Supabase~~
+- [x] ~~Validar `/api/db_health`~~ ← **OK em 2026-04-25**
+
+(sem pendências bloqueantes no momento)
 
 ---
 

@@ -1,45 +1,65 @@
 "use client";
 
-import { useState } from "react";
-
-interface Cliente {
-  id: string;
-  nome: string;
-  telefone: string;
-  email: string;
-  criado_em: string;
-}
-
-const MOCK_CLIENTES: Cliente[] = [
-  { id: "1", nome: "João Silva", telefone: "(11) 99999-0001", email: "joao@email.com", criado_em: "2026-04-01" },
-  { id: "2", nome: "Maria Santos", telefone: "(11) 99999-0002", email: "maria@email.com", criado_em: "2026-04-10" },
-  { id: "3", nome: "Carlos Oliveira", telefone: "(11) 99999-0003", email: "carlos@email.com", criado_em: "2026-04-15" },
-];
+import { useEffect, useState } from "react";
+import { ApiError, api, type Cliente } from "@/lib/api";
 
 export default function ClientesPage() {
-  const [clientes, setClientes] = useState<Cliente[]>(MOCK_CLIENTES);
+  const [clientes, setClientes] = useState<Cliente[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ nome: "", telefone: "", email: "" });
   const [saving, setSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    const novo: Cliente = {
-      id: String(Date.now()),
-      nome: form.nome,
-      telefone: form.telefone,
-      email: form.email,
-      criado_em: new Date().toISOString().split("T")[0],
-    };
-    setClientes((prev) => [novo, ...prev]);
-    setForm({ nome: "", telefone: "", email: "" });
-    setShowForm(false);
-    setSaving(false);
+  async function carregar() {
+    try {
+      setLoadError(null);
+      const data = await api.clientes.listar();
+      setClientes(data);
+    } catch (e) {
+      setLoadError(e instanceof ApiError ? e.message : "Erro ao carregar clientes");
+      setClientes([]);
+    }
   }
 
-  function handleDelete(id: string) {
-    setClientes((prev) => prev.filter((c) => c.id !== id));
+  useEffect(() => {
+    carregar();
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setFormErrors([]);
+    try {
+      await api.clientes.criar({
+        nome: form.nome,
+        telefone: form.telefone,
+        email: form.email || undefined,
+      });
+      setForm({ nome: "", telefone: "", email: "" });
+      setShowForm(false);
+      await carregar();
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setFormErrors(e.errors.length > 0 ? e.errors : [e.message]);
+      } else {
+        setFormErrors(["Erro inesperado ao salvar."]);
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Excluir este cliente? Os veículos vinculados também serão removidos.")) {
+      return;
+    }
+    try {
+      await api.clientes.excluir(id);
+      await carregar();
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : "Erro ao excluir.");
+    }
   }
 
   return (
@@ -83,15 +103,23 @@ export default function ClientesPage() {
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">E-mail</label>
               <input
-                required
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                placeholder="email@exemplo.com"
+                placeholder="email@exemplo.com (opcional)"
               />
             </div>
           </div>
+          {formErrors.length > 0 && (
+            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <ul className="list-disc list-inside">
+                {formErrors.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="mt-4 flex justify-end">
             <button
               type="submit"
@@ -102,6 +130,12 @@ export default function ClientesPage() {
             </button>
           </div>
         </form>
+      )}
+
+      {loadError && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {loadError}
+        </div>
       )}
 
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -116,7 +150,13 @@ export default function ClientesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {clientes.length === 0 ? (
+            {clientes === null ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  Carregando...
+                </td>
+              </tr>
+            ) : clientes.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
                   Nenhum cliente cadastrado.
@@ -127,8 +167,10 @@ export default function ClientesPage() {
                 <tr key={cliente.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">{cliente.nome}</td>
                   <td className="px-4 py-3 text-slate-600">{cliente.telefone}</td>
-                  <td className="px-4 py-3 text-slate-600">{cliente.email}</td>
-                  <td className="px-4 py-3 text-slate-500">{cliente.criado_em}</td>
+                  <td className="px-4 py-3 text-slate-600">{cliente.email ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {new Date(cliente.criado_em).toLocaleDateString("pt-BR")}
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => handleDelete(cliente.id)}
