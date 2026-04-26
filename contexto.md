@@ -150,13 +150,30 @@ projeto/
 - [ ] **Pendente do usuário:** rodar as migrations + seed no SQL Editor do Supabase
 - [ ] Validar `/api/db_health` em produção retornando `{"ok": true, "db": "connected"}`
 
-### Etapa 3 — Backend (APIs serverless em Python)
-- [ ] CRUD `/api/clientes` (testes + implementação)
-- [ ] CRUD `/api/veiculos`
-- [ ] CRUD `/api/profissionais`
-- [ ] CRUD `/api/servicos`
-- [ ] `/api/agendamentos` (CRUD + verificação de conflito)
-- [ ] `/api/horarios_disponiveis` (lista janelas livres por profissional/serviço/dia)
+### Etapa 3 — Backend (APIs serverless em Python) ✅
+- [x] Helpers HTTP (`api/_lib/http_utils.py`) — read_json_body, write_json, parse_query, ValidationError (TDD: 8/8 ✅)
+- [x] Validadores leves (`api/_lib/validators.py`) — substituem o pydantic, evitam dependência extra (TDD: 20/20 ✅)
+- [x] Helper genérico de CRUD (`api/_lib/crud.py`) — handle_list/handle_create/method_not_allowed
+- [x] CRUD `/api/clientes` — GET (lista) + POST (cria) (TDD: 6/6 ✅)
+- [x] CRUD `/api/veiculos` — GET (com filtro `?cliente_id=`) + POST. GET embute `clientes(nome)` via PostgREST (TDD: 4/4 ✅)
+- [x] CRUD `/api/profissionais` — GET (apenas ativos por default; `?incluir_inativos=1` traz todos) + POST (TDD: 3/3 ✅)
+- [x] CRUD `/api/servicos` — GET + POST (TDD: 3/3 ✅)
+- [x] `/api/agendamentos` — GET (com joins), POST com **verificação de conflito de janela**, PATCH `?id=...` para atualizar status (TDD: 12/12 ✅)
+- [x] `/api/horarios_disponiveis` — gera slots 08:00–18:00 UTC, intervalo 30min, filtra os que conflitam (TDD: 7/7 ✅)
+- [x] Suite completa: **72/72 testes ✅**
+
+**Endpoints disponíveis (resumo):**
+
+| Rota | Métodos | Notas |
+|---|---|---|
+| `/api/health` | GET | Health do serviço |
+| `/api/db_health` | GET | Verifica conexão com Supabase |
+| `/api/clientes` | GET, POST | Lista (mais recentes primeiro) / cria |
+| `/api/veiculos` | GET, POST | GET aceita `?cliente_id=`; embute `clientes(nome)` |
+| `/api/profissionais` | GET, POST | GET filtra `ativo=true` por default; `?incluir_inativos=1` traz todos |
+| `/api/servicos` | GET, POST | Ordena por nome |
+| `/api/agendamentos` | GET, POST, PATCH | POST valida conflito (409 com `conflito_com`); PATCH `?id=` atualiza só o status |
+| `/api/horarios_disponiveis` | GET | Query params: `profissional_id`, `servico_id`, `data` (YYYY-MM-DD) |
 
 ### Etapa 4 — Frontend (Next.js) ✅
 - [x] Layout base com navbar de navegação + footer
@@ -183,13 +200,13 @@ projeto/
 
 | Funcionalidade | Prioridade | Etapa | Status |
 |---|---|---|---|
-| Cadastro de clientes e veículos | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
-| Cadastro de serviços | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
-| Agendamento com data e horário | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
-| Visualização de agenda | Alta | 4 | ✅ (frontend mock) |
-| Cadastro de profissionais/mecânicos | Média | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
-| Verificação de conflito de horário | Média | 3 | ⏳ |
-| Status do agendamento | Média | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
+| Cadastro de clientes e veículos | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
+| Cadastro de serviços | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
+| Agendamento com data e horário | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
+| Visualização de agenda | Alta | 4 | ✅ (frontend mock; integrar com `GET /api/agendamentos`) |
+| Cadastro de profissionais/mecânicos | Média | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
+| Verificação de conflito de horário | Média | 3 | ✅ (POST `/api/agendamentos` retorna 409 com `conflito_com`) |
+| Status do agendamento | Média | 3, 4 | ⏳ (backend ✅ via PATCH; falta integrar frontend) |
 | Notificação de agendamento próximo | Baixa | 5 | ⏳ |
 
 ---
@@ -219,3 +236,7 @@ projeto/
 | 2026-04-25 | Iniciar com `anon` key + RLS desabilitada | Não há autenticação ainda; trocar para `service_role` quando ativarmos RLS |
 | 2026-04-25 | UUIDs como PK (via `gen_random_uuid()`) | Padrão do Supabase, evita colisões e permite gerar IDs no client se preciso |
 | 2026-04-25 | Trocar SDK `supabase` por chamadas `httpx` ao PostgREST | SDK quebrou o build na Vercel (`uv pip install` exited with 1). httpx é leve, sem deps nativas, e cobre 100% do que precisamos (CRUD via REST) |
+| 2026-04-25 | Substituir pydantic por validadores manuais em `api/_lib/validators.py` | Mesmo motivo do supabase SDK: manter o pacote serverless leve. Validação do domínio é simples (5 entidades, regras curtas), funções puras bastam |
+| 2026-04-25 | Centralizar try/except dos endpoints em `api/_lib/crud.py` | Evita repetir tratamento de `ValidationError`, `MissingSupabaseConfigError` e `httpx.HTTPStatusError` em cada arquivo de rota |
+| 2026-04-25 | Janela comercial fixa 08:00–18:00 UTC, slots de 30min | Decisão de simplicidade para a v1; parametrizar por profissional só se virar requisito |
+| 2026-04-25 | Conflito de horário tratado em código Python, não em constraint SQL | PostgreSQL teria a constraint via `tstzrange` + EXCLUDE, mas exigiria join com `servicos` na constraint. Em Python fica mais legível e testável (função pura `detectar_conflito`) |
