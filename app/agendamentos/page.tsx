@@ -7,6 +7,11 @@ import {
   type Agendamento,
   type AgendamentoStatus,
 } from "@/lib/api";
+import {
+  PROXIMIDADE_COR,
+  PROXIMIDADE_LABEL,
+  calcularProximidade,
+} from "@/lib/proximidade";
 
 const STATUS_LABELS: Record<
   AgendamentoStatus,
@@ -17,6 +22,12 @@ const STATUS_LABELS: Record<
   concluido: { label: "Concluído", color: "bg-green-100 text-green-800" },
   cancelado: { label: "Cancelado", color: "bg-slate-100 text-slate-600" },
 };
+
+/** Status que ainda devem ser destacados como "próximos". */
+const STATUS_ATIVOS: ReadonlySet<AgendamentoStatus> = new Set([
+  "pendente",
+  "confirmado",
+]);
 
 function formatDateTime(dt: string) {
   const d = new Date(dt);
@@ -97,14 +108,22 @@ export default function AgendamentosPage() {
               ? `${a.veiculos.modelo} ${a.veiculos.placa}`
               : "—";
             const isUpdating = updatingId === a.id;
+            const proximidade = STATUS_ATIVOS.has(a.status)
+              ? calcularProximidade(a.data_hora)
+              : "futuro";
+            const proximidadeLabel = PROXIMIDADE_LABEL[proximidade];
+            const destaque =
+              proximidade === "atrasado" || proximidade === "agora"
+                ? "border-orange-300 ring-1 ring-orange-200"
+                : "border-slate-200";
             return (
               <div
                 key={a.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow transition"
+                className={`rounded-xl border bg-white p-4 shadow-sm hover:shadow transition sm:p-5 ${destaque}`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       <span className="text-lg font-semibold text-slate-900">
                         {a.clientes?.nome ?? "—"}
                       </span>
@@ -113,6 +132,13 @@ export default function AgendamentosPage() {
                       >
                         {statusInfo.label}
                       </span>
+                      {proximidadeLabel && (
+                        <span
+                          className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${PROXIMIDADE_COR[proximidade]}`}
+                        >
+                          {proximidadeLabel}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-slate-600 mb-1">
                       <span className="font-medium">Veículo:</span> {veiculoStr}
@@ -130,7 +156,7 @@ export default function AgendamentosPage() {
                       {formatDateTime(a.data_hora)}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row flex-wrap gap-2 sm:flex-col">
                     {a.status === "pendente" && (
                       <>
                         <button

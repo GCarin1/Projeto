@@ -177,22 +177,27 @@ projeto/
 
 ### Etapa 4 — Frontend (Next.js) ✅
 - [x] Layout base com navbar de navegação + footer
-- [x] Página `/clientes` (listagem + formulário de cadastro com dados mock)
-- [x] Página `/veiculos` (listagem + formulário com dados mock)
-- [x] Página `/profissionais` (leitura, com mock)
-- [x] Página `/servicos` (leitura em cards, com mock)
-- [x] Página `/agendamentos` (lista com status e ações — confirmar/concluir/cancelar)
-- [x] Página `/agendamentos/novo` (formulário em 2 etapas: cliente+serviço → profissional+horário)
+- [x] Página `/clientes` (listagem + cadastro + exclusão, integrada com `/api/clientes`)
+- [x] Página `/veiculos` (listagem + cadastro + exclusão, integrada com `/api/veiculos`)
+- [x] Página `/profissionais` (leitura via `/api/profissionais`, separa ativos e inativos)
+- [x] Página `/servicos` (cards via `/api/servicos`)
+- [x] Página `/agendamentos` (lista via `/api/agendamentos`, mudança de status via PATCH)
+- [x] Página `/agendamentos/novo` (formulário em 2 etapas, usa `/api/horarios_disponiveis`)
 - [x] Homepage atualizada com cards e ícones
-- [x] `npm run build` validado — 10 páginas geradas com sucesso
-- [x] Frontend construído com dados mock — aguardando integração com backend Python/Supabase
+- [x] `lib/api.ts` — cliente HTTP tipado, `ApiError` consistente, exportado para todas as páginas
+- [x] `npm run build` validado — 10 páginas estáticas + endpoints Python serverless
+- [x] **Frontend totalmente integrado com a API real** (sem mocks)
 
-### Etapa 5 — Refinamentos
-- [ ] Validações e mensagens de erro amigáveis
-- [ ] Polimento do layout (responsivo)
-- [ ] **Notificação de agendamento próximo** (prioridade baixa, deixada para o fim)
-- [ ] Documentação final no README
-- [ ] Deploy de produção
+### Etapa 5 — Refinamentos ✅
+- [x] Navbar responsivo com menu hamburguer (`app/_components/navbar.tsx`)
+- [x] Destaque visual de agendamento próximo na agenda (badges "Hoje", "Amanhã", "Agora", "Atrasado")
+- [x] Cálculo de proximidade isolado em `lib/proximidade.ts` (TDD: 5/5 ✅)
+- [x] Validações client-side de placa (formato BR antigo + Mercosul) e telefone (10–11 dígitos) em `lib/validacao.ts` (TDD: 9/9 ✅)
+- [x] Trim e normalização de inputs antes do POST
+- [x] Homepage atualizada (sem menção a mock)
+- [x] Suite total: **74 testes Python + 30 testes frontend ✅**
+- [ ] Deploy de produção (passo manual do usuário na Vercel)
+- [ ] Documentação didática em `/docs` (a fazer, último passo)
 
 ---
 
@@ -200,14 +205,14 @@ projeto/
 
 | Funcionalidade | Prioridade | Etapa | Status |
 |---|---|---|---|
-| Cadastro de clientes e veículos | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
-| Cadastro de serviços | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
-| Agendamento com data e horário | Alta | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
-| Visualização de agenda | Alta | 4 | ✅ (frontend mock; integrar com `GET /api/agendamentos`) |
-| Cadastro de profissionais/mecânicos | Média | 3, 4 | ⏳ (backend ✅; falta integrar frontend) |
-| Verificação de conflito de horário | Média | 3 | ✅ (POST `/api/agendamentos` retorna 409 com `conflito_com`) |
-| Status do agendamento | Média | 3, 4 | ⏳ (backend ✅ via PATCH; falta integrar frontend) |
-| Notificação de agendamento próximo | Baixa | 5 | ⏳ |
+| Cadastro de clientes e veículos | Alta | 3, 4 | ✅ |
+| Cadastro de serviços | Alta | 3, 4 | ✅ (leitura na UI; criação via API) |
+| Agendamento com data e horário | Alta | 3, 4 | ✅ (form em 2 etapas + slots disponíveis) |
+| Visualização de agenda | Alta | 4 | ✅ |
+| Cadastro de profissionais/mecânicos | Média | 3, 4 | ✅ (leitura na UI; criação via API) |
+| Verificação de conflito de horário | Média | 3 | ✅ (POST retorna 409 com `conflito_com`) |
+| Status do agendamento | Média | 3, 4 | ✅ (botões "Confirmar / Concluir / Cancelar") |
+| Notificação de agendamento próximo | Baixa | 5 | ✅ (badge visual: Hoje, Amanhã, Agora, Atrasado) |
 
 ---
 
@@ -237,3 +242,6 @@ projeto/
 | 2026-04-25 | Centralizar try/except dos endpoints em `api/_lib/crud.py` | Evita repetir tratamento de `ValidationError`, `MissingSupabaseConfigError` e `httpx.HTTPStatusError` em cada arquivo de rota |
 | 2026-04-25 | Janela comercial fixa 08:00–18:00 UTC, slots de 30min | Decisão de simplicidade para a v1; parametrizar por profissional só se virar requisito |
 | 2026-04-25 | Conflito de horário tratado em código Python, não em constraint SQL | PostgreSQL teria a constraint via `tstzrange` + EXCLUDE, mas exigiria join com `servicos` na constraint. Em Python fica mais legível e testável (função pura `detectar_conflito`) |
+| 2026-04-26 | Notificação de agendamento próximo implementada como **destaque visual** (badge), sem push real | Mantém o requisito de baixa prioridade da TAP atendido sem precisar de service worker, e-mail ou SMS. Função pura `calcularProximidade` em `lib/proximidade.ts`, fácil de evoluir para push depois |
+| 2026-04-26 | Validação no client é só pra UX (placa, telefone) — backend é a autoridade | Evita request inválida e dá feedback rápido. Se o usuário burlar (DevTools), o backend ainda recusa via `ValidationError` |
+| 2026-04-26 | Navbar responsivo com componente cliente isolado em `app/_components/navbar.tsx` | `layout.tsx` precisa exportar `metadata` (server component); o menu mobile precisa de estado (`useState`) — separar é a saída idiomática do App Router |

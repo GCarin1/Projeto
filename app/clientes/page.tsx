@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ApiError, api, type Cliente } from "@/lib/api";
+import { validarTelefone } from "@/lib/validacao";
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[] | null>(null);
@@ -28,13 +29,21 @@ export default function ClientesPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const validacao: string[] = [];
+    const erroTelefone = validarTelefone(form.telefone);
+    if (erroTelefone) validacao.push(erroTelefone);
+    if (!form.nome.trim()) validacao.push("Nome é obrigatório.");
+    if (validacao.length > 0) {
+      setFormErrors(validacao);
+      return;
+    }
     setSaving(true);
     setFormErrors([]);
     try {
       await api.clientes.criar({
-        nome: form.nome,
-        telefone: form.telefone,
-        email: form.email || undefined,
+        nome: form.nome.trim(),
+        telefone: form.telefone.trim(),
+        email: form.email.trim() || undefined,
       });
       setForm({ nome: "", telefone: "", email: "" });
       setShowForm(false);

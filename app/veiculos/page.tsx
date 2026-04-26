@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ApiError, api, type Cliente, type Veiculo } from "@/lib/api";
+import { normalizarPlaca, validarPlaca } from "@/lib/validacao";
 
 export default function VeiculosPage() {
   const [veiculos, setVeiculos] = useState<Veiculo[] | null>(null);
@@ -39,14 +40,20 @@ export default function VeiculosPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const placa = normalizarPlaca(form.placa);
+    const erroPlaca = validarPlaca(placa);
+    if (erroPlaca) {
+      setFormErrors([erroPlaca]);
+      return;
+    }
     setSaving(true);
     setFormErrors([]);
     try {
       await api.veiculos.criar({
         cliente_id: form.cliente_id,
-        placa: form.placa.toUpperCase(),
-        marca: form.marca,
-        modelo: form.modelo,
+        placa,
+        marca: form.marca.trim(),
+        modelo: form.modelo.trim(),
         ano: form.ano ? parseInt(form.ano) : undefined,
       });
       setForm({ cliente_id: "", placa: "", marca: "", modelo: "", ano: "" });
