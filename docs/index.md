@@ -1,3 +1,7 @@
+---
+title: V8 on Fire — Guia de Estudo
+---
+
 # 📚 V8 on Fire — Guia de Estudo
 
 Bem-vindo! Esta pasta tem uma documentação **didática** do projeto, pensada

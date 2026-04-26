@@ -1,7 +1,7 @@
 # 11. Integração: Frontend ↔ Backend ↔ Banco
 
 > 🧭 Capítulo extra.
-> ← [10. Glossário](./10-glossario.md) | [↑ Voltar ao sumário](./README.md)
+> ← [10. Glossário](./10-glossario.md) | [↑ Voltar ao sumário](./index.md)
 
 Este capítulo é um **mergulho técnico** em como as três camadas do
 sistema conversam entre si. Os capítulos [3](./03-arquitetura.md) e
@@ -541,4 +541,4 @@ Cada exercício te leva pelas três camadas. É o melhor jeito de fixar.
 
 ---
 
-[↑ Voltar ao sumário](./README.md)
+[↑ Voltar ao sumário](./index.md)

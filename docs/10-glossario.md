@@ -294,4 +294,4 @@ nascimento" no cliente) e veja o que acontece. **Programar é experimentar.**
 Boa sorte na sua jornada — e qualquer dúvida, abre uma issue ou volta
 nos capítulos.
 
-[↑ Voltar ao sumário](./README.md)
+[↑ Voltar ao sumário](./index.md)

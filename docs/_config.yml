@@ -1,0 +1,27 @@
+title: V8 on Fire
+description: Sistema de agendamento web para a oficina mecânica V8 on Fire — documentação didática para estudo.
+theme: jekyll-theme-cayman
+lang: pt-BR
+
+# Converte links para arquivos .md em links HTML automaticamente.
+# Permite que `[texto](./01-visao-geral.md)` funcione tanto no GitHub
+# (renderização Markdown) quanto no site Jekyll.
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
+# Inclui arquivos .md (já é o default, mas explicitar não custa).
+include:
+  - "*.md"
+
+# Remove arquivos que não devem virar página do site.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# URL "amigável" — Jekyll mantém index.html como raiz da pasta.
+permalink: pretty
