@@ -158,12 +158,17 @@ projeto/
 - [ ] `/api/agendamentos` (CRUD + verificação de conflito)
 - [ ] `/api/horarios_disponiveis` (lista janelas livres por profissional/serviço/dia)
 
-### Etapa 4 — Frontend (Next.js)
-- [ ] Layout base + navegação
-- [ ] Páginas de cadastro: clientes, veículos, profissionais, serviços
-- [ ] Formulário de novo agendamento (com seletor de profissional + horário disponível)
-- [ ] Visualização da agenda (lista/calendário)
-- [ ] Status do agendamento (mudar para confirmado/concluído/cancelado)
+### Etapa 4 — Frontend (Next.js) ✅
+- [x] Layout base com navbar de navegação + footer
+- [x] Página `/clientes` (listagem + formulário de cadastro com dados mock)
+- [x] Página `/veiculos` (listagem + formulário com dados mock)
+- [x] Página `/profissionais` (leitura, com mock)
+- [x] Página `/servicos` (leitura em cards, com mock)
+- [x] Página `/agendamentos` (lista com status e ações — confirmar/concluir/cancelar)
+- [x] Página `/agendamentos/novo` (formulário em 2 etapas: cliente+serviço → profissional+horário)
+- [x] Homepage atualizada com cards e ícones
+- [x] `npm run build` validado — 10 páginas geradas com sucesso
+- [x] Frontend construído com dados mock — aguardando integração com backend Python/Supabase
 
 ### Etapa 5 — Refinamentos
 - [ ] Validações e mensagens de erro amigáveis
@@ -178,13 +183,13 @@ projeto/
 
 | Funcionalidade | Prioridade | Etapa | Status |
 |---|---|---|---|
-| Cadastro de clientes e veículos | Alta | 3, 4 | ⏳ |
-| Cadastro de serviços | Alta | 3, 4 | ⏳ |
-| Agendamento com data e horário | Alta | 3, 4 | ⏳ |
-| Visualização de agenda | Alta | 4 | ⏳ |
-| Cadastro de profissionais/mecânicos | Média | 3, 4 | ⏳ |
+| Cadastro de clientes e veículos | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
+| Cadastro de serviços | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
+| Agendamento com data e horário | Alta | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
+| Visualização de agenda | Alta | 4 | ✅ (frontend mock) |
+| Cadastro de profissionais/mecânicos | Média | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
 | Verificação de conflito de horário | Média | 3 | ⏳ |
-| Status do agendamento | Média | 3, 4 | ⏳ |
+| Status do agendamento | Média | 3, 4 | ⏳ (frontend mock pronto, falta backend) |
 | Notificação de agendamento próximo | Baixa | 5 | ⏳ |
 
 ---
