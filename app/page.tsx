@@ -55,7 +55,7 @@ export default function Home() {
       </section>
 
       <footer className="mt-16 text-sm text-slate-500">
-        Frontend em mock — aguardando integração com backend Python/Supabase.
+        Conectado ao backend Python serverless · dados persistidos no Supabase.
       </footer>
     </main>
   );
