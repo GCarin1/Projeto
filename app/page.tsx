@@ -13,7 +13,7 @@ export default function Home() {
           href="/agendamentos"
           className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <div className="text-3xl mb-2">📅</div>
+          <div className="text-3xl mb-2" aria-hidden="true">📅</div>
           <h2 className="text-xl font-semibold text-slate-900">Agenda</h2>
           <p className="mt-1 text-sm text-slate-600">
             Ver agendamentos e gerenciar status.
@@ -24,7 +24,7 @@ export default function Home() {
           href="/agendamentos/novo"
           className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <div className="text-3xl mb-2">➕</div>
+          <div className="text-3xl mb-2" aria-hidden="true">➕</div>
           <h2 className="text-xl font-semibold text-slate-900">Novo Agendamento</h2>
           <p className="mt-1 text-sm text-slate-600">
             Marcar um serviço para um cliente.
@@ -35,7 +35,7 @@ export default function Home() {
           href="/clientes"
           className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <div className="text-3xl mb-2">👥</div>
+          <div className="text-3xl mb-2" aria-hidden="true">👥</div>
           <h2 className="text-xl font-semibold text-slate-900">Clientes</h2>
           <p className="mt-1 text-sm text-slate-600">
             Cadastro de clientes e veículos.
@@ -46,7 +46,7 @@ export default function Home() {
           href="/servicos"
           className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-orange-300 hover:shadow hover:bg-orange-50"
         >
-          <div className="text-3xl mb-2">🔧</div>
+          <div className="text-3xl mb-2" aria-hidden="true">🔧</div>
           <h2 className="text-xl font-semibold text-slate-900">Serviços</h2>
           <p className="mt-1 text-sm text-slate-600">
             Catálogo de serviços e profissionais.
@@ -60,4 +60,3 @@ export default function Home() {
     </main>
   );
 }
-Sat Apr 25 20:11:22     2026
